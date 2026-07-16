@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shok Patra Invitation Generator</title>
+    <title>शोक पत्र - आमंत्रण पत्र निर्माता</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -64,7 +64,7 @@
             display: block;
             font-weight: 600;
             margin-bottom: 6px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .input-group input[type="text"] {
@@ -74,6 +74,24 @@
             border-radius: 6px;
             font-size: 1rem;
             box-sizing: border-box;
+        }
+
+        .toggle-group {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .toggle-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
 
         .controls-grid {
@@ -98,7 +116,7 @@
 
         .control-item label {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 5px;
         }
@@ -170,48 +188,54 @@
 <body>
 
 <div class="container">
-    <h1>Shok Patra - Personalized Card Generator</h1>
+    <h1>शोक पत्र - आमंत्रण पत्र निर्माता</h1>
 
-    <!-- Upload Section if image is not in the directory -->
+    <!-- Image Upload Area -->
     <div class="upload-section" onclick="document.getElementById('fileInput').click()">
-        <p style="margin: 0; color: #64748b;">📷 Click to upload/change your Shok Patra image (or name it <strong>shok_patra.png</strong> in the same folder)</p>
+        <p style="margin: 0; color: #64748b;">📷 शोक पत्र की फोटो बदलने के लिए यहाँ क्लिक करें (या नाम <strong>shok_patra.png</strong> रखें)</p>
         <input type="file" id="fileInput" class="hidden" accept="image/*">
     </div>
 
-    <!-- Text Input -->
+    <!-- Name Input (Hindi/English) -->
     <div class="input-group">
-        <label for="nameInput">Enter Guest Name (English):</label>
-        <input type="text" id="nameInput" placeholder="e.g. Mr. Rajesh Kumar" value="Mr. Rajesh Kumar">
+        <label for="nameInput">अतिथि का नाम दर्ज करें (हिंदी में):</label>
+        <input type="text" id="nameInput" placeholder="जैसे: श्री राजेश कुमार शर्मा" value="श्री राजेश कुमार शर्मा">
     </div>
 
-    <!-- Fine Tuning Controls -->
+    <!-- Sapariwar Toggle Switch -->
+    <div class="toggle-group" onclick="toggleCheckbox(event)">
+        <input type="checkbox" id="sapariwarToggle">
+        <label for="sapariwarToggle" style="cursor:pointer;">सपरिवार जोड़ना है</label>
+    </div>
+
+    <!-- Fine Tuning Sliders -->
     <div class="controls-grid">
         <div class="control-item">
-            <label for="posX">X Position (Left/Right)</label>
-            <input type="range" id="posX" min="0" max="1000" value="120">
+            <label for="posX">नाम की X स्थिति (दाएँ/बाएँ)</label>
+            <input type="range" id="posX" min="0" max="1000" value="135">
         </div>
         <div class="control-item">
-            <label for="posY">Y Position (Up/Down)</label>
-            <input type="range" id="posY" min="0" max="1000" value="95">
+            <label for="posY">नाम की Y position (ऊपर/नीचे)</label>
+            <input type="range" id="posY" min="0" max="1000" value="100">
         </div>
         <div class="control-item">
-            <label for="fontSize">Font Size</label>
-            <input type="range" id="fontSize" min="10" max="100" value="24">
+            <label for="fontSize">अक्षर का आकार (Font Size)</label>
+            <input type="range" id="fontSize" min="10" max="100" value="30">
         </div>
     </div>
 
-    <!-- Canvas Preview -->
+    <!-- Canvas Preview Box -->
     <div class="preview-container">
         <canvas id="shokPatraCanvas"></canvas>
     </div>
 
-    <!-- Action Buttons -->
+    <!-- Actions -->
     <div class="action-buttons">
         <button class="btn btn-download" onclick="downloadImage()">
-            📥 Save to Gallery
+            📥 गैलरी में सहेजें
         </button>
         <button class="btn btn-whatsapp" onclick="shareOnWhatsApp()">
-            💬 Send on WhatsApp
+            💬 व्हाट्सएप पर भेजें
         </button>
     </div>
 </div>
@@ -221,38 +245,33 @@
     const ctx = canvas.getContext('2d');
     const fileInput = document.getElementById('fileInput');
     const nameInput = document.getElementById('nameInput');
+    const sapariwarToggle = document.getElementById('sapariwarToggle');
     const posXSlider = document.getElementById('posX');
     const posYSlider = document.getElementById('posY');
     const fontSizeSlider = document.getElementById('fontSize');
 
     const img = new Image();
-    
-    // Set default fallback path (assumes the image is saved as 'shok_patra.png' next to this HTML file)
-    img.src = 'shok_patra.png';
+    img.src = 'shok_patra.png'; // Local fallback path
 
     img.onload = function() {
-        // Set canvas to match the original image resolution
         canvas.width = img.width;
         canvas.height = img.height;
 
-        // Automatically configure sliders dynamically based on image size
         posXSlider.max = img.width;
         posYSlider.max = img.height;
         
-        // Logical default positions (approx 12% from left, 12.5% from top)
-        posXSlider.value = Math.round(img.width * 0.12);
-        posYSlider.value = Math.round(img.height * 0.125);
-        fontSizeSlider.value = Math.round(img.height * 0.035);
+        // Exact 8px spacing after 'श्रीमान्' based on standard dimensions
+        posXSlider.value = 135; 
+        posYSlider.value = 100;
+        fontSizeSlider.value = 30; // Matches 'श्रीमान्' text size
 
         draw();
     };
 
-    // If local file 'shok_patra.png' is missing, alert user they can upload it.
     img.onerror = function() {
-        alert("Please select/upload your Shok Patra image using the upload area at the top.");
+        alert("कृपया ऊपर दिए गए बॉक्स पर क्लिक करके अपनी 'shok_patra.png' इमेज अपलोड करें।");
     };
 
-    // Handle Manual Image Upload
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -264,8 +283,17 @@
         }
     });
 
-    // Redraw Canvas whenever any input changes
+    // Helper to allow clicking anywhere on the background gray box to toggle
+    function toggleCheckbox(e) {
+        if(e.target.id !== 'sapariwarToggle') {
+            sapariwarToggle.checked = !sapariwarToggle.checked;
+            draw();
+        }
+    }
+
+    // Event Listeners for real-time changes
     nameInput.addEventListener('input', draw);
+    sapariwarToggle.addEventListener('change', draw);
     posXSlider.addEventListener('input', draw);
     posYSlider.addEventListener('input', draw);
     fontSizeSlider.addEventListener('input', draw);
@@ -273,26 +301,32 @@
     function draw() {
         if (!img.complete) return;
 
-        // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Draw original background image
         ctx.drawImage(img, 0, 0);
 
-        // Fetch values
         const name = nameInput.value;
         const x = parseInt(posXSlider.value);
         const y = parseInt(posYSlider.value);
         const size = parseInt(fontSizeSlider.value);
 
-        // Style and write the name
+        // Render Guest Name
         ctx.font = `bold ${size}px "Times New Roman", Georgia, serif`;
-        ctx.fillStyle = '#000000'; // Black color to match template
-        ctx.textBaseline = 'bottom'; // Ensures text aligns nicely on the horizontal line
+        ctx.fillStyle = '#000000';
+        ctx.textBaseline = 'bottom';
         ctx.fillText(name, x, y);
+
+        // Render 'सपरिवार' if toggle is active
+        if (sapariwarToggle.checked) {
+            // Positioned perfectly at the left alignment of the container box
+            // aligning directly below the 'श्रीमान्' margin row
+            const sapariwarX = 42; 
+            const sapariwarY = y + size + 12; // Automatically adjustments based on size
+            
+            ctx.font = `bold ${size - 2}px "Times New Roman", Georgia, serif`;
+            ctx.fillText("सपरिवार", sapariwarX, sapariwarY);
+        }
     }
 
-    // Function 1: Save Image to Device Gallery
     function downloadImage() {
         const link = document.createElement('a');
         link.download = `shok_patra_${nameInput.value.replace(/\s+/g, '_')}.png`;
@@ -300,35 +334,31 @@
         link.click();
     }
 
-    // Function 2: Send Image via WhatsApp
     async function shareOnWhatsApp() {
-        draw(); // Ensure it is updated
-
+        draw();
         canvas.toBlob(async (blob) => {
             if (!blob) {
-                alert("Could not process image.");
+                alert("इमेज प्रोसेस नहीं हो सकी।");
                 return;
             }
 
-            const file = new File([blob], "shok_patra_invitation.png", { type: "image/png" });
+            const file = new File([blob], "shok_patra.png", { type: "image/png" });
 
-            // Detect if Web Share API is available (primarily mobile devices & modern browsers)
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
                         files: [file],
-                        title: 'Shok Patra Invitation',
-                        text: `Shok Patra Invitation for ${nameInput.value}`
+                        title: 'शोक पत्र आमंत्रण',
+                        text: `${nameInput.value} के लिए शोक पत्र आमंत्रण`
                     });
                 } catch (error) {
                     if (error.name !== 'AbortError') {
-                        alert("Error sharing: " + error.message);
+                        alert("शेयर करने में समस्या आई: " + error.message);
                     }
                 }
             } else {
-                // Desktop fallback behavior
                 downloadImage();
-                alert("Direct image sharing is restricted by desktop browsers. \n\nWe have automatically downloaded the image to your gallery. Please open WhatsApp, select your contact, and attach the downloaded image.");
+                alert("डेस्कटॉप ब्राउज़र सीधे इमेज शेयर ब्लॉक करते हैं।\n\nइमेज आपकी गैलरी में सेव कर दी गई है। कृपया व्हाट्सएप खोलें और इसे अटैचमेंट की तरह भेजें।");
                 window.open('https://web.whatsapp.com/', '_blank');
             }
         }, 'image/png');
