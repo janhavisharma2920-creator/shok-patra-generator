@@ -40,20 +40,7 @@
             margin-top: 0;
             font-size: 1.8rem;
             color: #111827;
-        }
-
-        .upload-section {
-            border: 2px dashed #cbd5e1;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .upload-section:hover {
-            background-color: #f8fafc;
+            margin-bottom: 25px;
         }
 
         .input-group {
@@ -69,7 +56,7 @@
 
         .input-group input[type="text"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             font-size: 1rem;
@@ -80,7 +67,7 @@
             background: #f1f5f9;
             padding: 12px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -98,7 +85,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         @media (max-width: 600px) {
@@ -130,7 +117,7 @@
             overflow: auto;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             background: #e2e8f0;
             display: flex;
             justify-content: center;
@@ -149,7 +136,7 @@
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 14px 20px;
             font-size: 1rem;
             font-weight: 600;
             border: none;
@@ -179,10 +166,6 @@
         .btn-whatsapp:hover {
             background-color: #20ba5a;
         }
-
-        .hidden {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -190,25 +173,19 @@
 <div class="container">
     <h1>शोक पत्र - आमंत्रण पत्र निर्माता</h1>
 
-    <!-- Image Upload Area -->
-    <div class="upload-section" onclick="document.getElementById('fileInput').click()">
-        <p style="margin: 0; color: #64748b;">📷 शोक पत्र की फोटो बदलने के लिए यहाँ क्लिक करें (या नाम <strong>shok_patra.png</strong> रखें)</p>
-        <input type="file" id="fileInput" class="hidden" accept="image/*">
-    </div>
-
-    <!-- Name Input (Hindi/English) -->
+    <!-- Guest Name Input -->
     <div class="input-group">
         <label for="nameInput">अतिथि का नाम दर्ज करें (हिंदी में):</label>
         <input type="text" id="nameInput" placeholder="जैसे: श्री राजेश कुमार शर्मा" value="श्री राजेश कुमार शर्मा">
     </div>
 
-    <!-- Sapariwar Toggle Switch -->
+    <!-- Sapariwar Toggle -->
     <div class="toggle-group" onclick="toggleCheckbox(event)">
         <input type="checkbox" id="sapariwarToggle">
         <label for="sapariwarToggle" style="cursor:pointer;">सपरिवार जोड़ना है</label>
     </div>
 
-    <!-- Fine Tuning Sliders -->
+    <!-- Live Sliders -->
     <div class="controls-grid">
         <div class="control-item">
             <label for="posX">नाम की X स्थिति (दाएँ/बाएँ)</label>
@@ -224,12 +201,12 @@
         </div>
     </div>
 
-    <!-- Canvas Preview Box -->
+    <!-- Image Canvas Preview -->
     <div class="preview-container">
         <canvas id="shokPatraCanvas"></canvas>
     </div>
 
-    <!-- Actions -->
+    <!-- Bottom Actions -->
     <div class="action-buttons">
         <button class="btn btn-download" onclick="downloadImage()">
             📥 गैलरी में सहेजें
@@ -243,15 +220,15 @@
 <script>
     const canvas = document.getElementById('shokPatraCanvas');
     const ctx = canvas.getContext('2d');
-    const fileInput = document.getElementById('fileInput');
     const nameInput = document.getElementById('nameInput');
     const sapariwarToggle = document.getElementById('sapariwarToggle');
     const posXSlider = document.getElementById('posX');
     const posYSlider = document.getElementById('posY');
     const fontSizeSlider = document.getElementById('fontSize');
 
+    // Permanent Image Loading from GitHub Repository
     const img = new Image();
-    img.src = 'shok_patra.png'; // Local fallback path
+    img.src = 'shok_patra.png'; 
 
     img.onload = function() {
         canvas.width = img.width;
@@ -260,30 +237,18 @@
         posXSlider.max = img.width;
         posYSlider.max = img.height;
         
-        // Exact 8px spacing after 'श्रीमान्' based on standard dimensions
+        // Default alignments matching 'श्रीमान्' text line
         posXSlider.value = 135; 
         posYSlider.value = 100;
-        fontSizeSlider.value = 30; // Matches 'श्रीमान्' text size
+        fontSizeSlider.value = 30; 
 
         draw();
     };
 
     img.onerror = function() {
-        alert("कृपया ऊपर दिए गए बॉक्स पर क्लिक करके अपनी 'shok_patra.png' इमेज अपलोड करें।");
+        alert("त्रुटि: 'shok_patra.png' इमेज लोड नहीं हो सकी। कृपया सुनिश्चित करें कि यह आपके GitHub repository में मौजूद है।");
     };
 
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Helper to allow clicking anywhere on the background gray box to toggle
     function toggleCheckbox(e) {
         if(e.target.id !== 'sapariwarToggle') {
             sapariwarToggle.checked = !sapariwarToggle.checked;
@@ -291,7 +256,6 @@
         }
     }
 
-    // Event Listeners for real-time changes
     nameInput.addEventListener('input', draw);
     sapariwarToggle.addEventListener('change', draw);
     posXSlider.addEventListener('input', draw);
@@ -309,21 +273,24 @@
         const y = parseInt(posYSlider.value);
         const size = parseInt(fontSizeSlider.value);
 
-        // Render Guest Name
+        // Print Guest Name
         ctx.font = `bold ${size}px "Times New Roman", Georgia, serif`;
         ctx.fillStyle = '#000000';
         ctx.textBaseline = 'bottom';
+        ctx.textAlign = 'left';
         ctx.fillText(name, x, y);
 
-        // Render 'सपरिवार' if toggle is active
+        // Print 'सपरिवार' on the right side if toggled
         if (sapariwarToggle.checked) {
-            // Positioned perfectly at the left alignment of the container box
-            // aligning directly below the 'श्रीमान्' margin row
-            const sapariwarX = 42; 
-            const sapariwarY = y + size + 12; // Automatically adjustments based on size
-            
+            const sapariwarX = canvas.width - 50; // Dynamic right alignment
+            const sapariwarY = y; 
+
             ctx.font = `bold ${size - 2}px "Times New Roman", Georgia, serif`;
+            ctx.fillStyle = '#000000';
+            ctx.textBaseline = 'bottom';
+            ctx.textAlign = 'right'; // Aligns text strictly to the right margin
             ctx.fillText("सपरिवार", sapariwarX, sapariwarY);
+            ctx.textAlign = 'left';  // Reset to default
         }
     }
 
@@ -349,7 +316,7 @@
                     await navigator.share({
                         files: [file],
                         title: 'शोक पत्र आमंत्रण',
-                        text: `${nameInput.value} के लिए शोक पत्र आमंत्रण`
+                        text: `${nameInput.value} के लिए शोक पत्र`
                     });
                 } catch (error) {
                     if (error.name !== 'AbortError') {
@@ -358,7 +325,7 @@
                 }
             } else {
                 downloadImage();
-                alert("डेस्कटॉप ब्राउज़र सीधे इमेज शेयर ब्लॉक करते हैं।\n\nइमेज आपकी गैलरी में सेव कर दी गई है। कृपया व्हाट्सएप खोलें और इसे अटैचमेंट की तरह भेजें।");
+                alert("व्हाट्सएप पर डायरेक्ट भेजने के लिए कृपया इस लिंक को अपने मोबाइल ब्राउज़र में खोलें।\n\nडेस्कटॉप के लिए इमेज डाउनलोड हो गई है, इसे मैन्युअली अटैच करें।");
                 window.open('https://web.whatsapp.com/', '_blank');
             }
         }, 'image/png');
