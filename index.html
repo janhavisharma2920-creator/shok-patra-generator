@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shok Patra Invitation Generator</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.8rem;
+            color: #111827;
+        }
+
+        .upload-section {
+            border: 2px dashed #cbd5e1;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .upload-section:hover {
+            background-color: #f8fafc;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .control-item {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .control-item label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .control-item input[type="range"] {
+            width: 100%;
+        }
+
+        .preview-container {
+            width: 100%;
+            overflow: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: #e2e8f0;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-download {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+            color: white;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #20ba5a;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Shok Patra - Personalized Card Generator</h1>
+
+    <!-- Upload Section if image is not in the directory -->
+    <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+        <p style="margin: 0; color: #64748b;">📷 Click to upload/change your Shok Patra image (or name it <strong>shok_patra.png</strong> in the same folder)</p>
+        <input type="file" id="fileInput" class="hidden" accept="image/*">
+    </div>
+
+    <!-- Text Input -->
+    <div class="input-group">
+        <label for="nameInput">Enter Guest Name (English):</label>
+        <input type="text" id="nameInput" placeholder="e.g. Mr. Rajesh Kumar" value="Mr. Rajesh Kumar">
+    </div>
+
+    <!-- Fine Tuning Controls -->
+    <div class="controls-grid">
+        <div class="control-item">
+            <label for="posX">X Position (Left/Right)</label>
+            <input type="range" id="posX" min="0" max="1000" value="120">
+        </div>
+        <div class="control-item">
+            <label for="posY">Y Position (Up/Down)</label>
+            <input type="range" id="posY" min="0" max="1000" value="95">
+        </div>
+        <div class="control-item">
+            <label for="fontSize">Font Size</label>
+            <input type="range" id="fontSize" min="10" max="100" value="24">
+        </div>
+    </div>
+
+    <!-- Canvas Preview -->
+    <div class="preview-container">
+        <canvas id="shokPatraCanvas"></canvas>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button class="btn btn-download" onclick="downloadImage()">
+            📥 Save to Gallery
+        </button>
+        <button class="btn btn-whatsapp" onclick="shareOnWhatsApp()">
+            💬 Send on WhatsApp
+        </button>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('shokPatraCanvas');
+    const ctx = canvas.getContext('2d');
+    const fileInput = document.getElementById('fileInput');
+    const nameInput = document.getElementById('nameInput');
+    const posXSlider = document.getElementById('posX');
+    const posYSlider = document.getElementById('posY');
+    const fontSizeSlider = document.getElementById('fontSize');
+
+    const img = new Image();
+    
+    // Set default fallback path (assumes the image is saved as 'shok_patra.png' next to this HTML file)
+    img.src = 'shok_patra.png';
+
+    img.onload = function() {
+        // Set canvas to match the original image resolution
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Automatically configure sliders dynamically based on image size
+        posXSlider.max = img.width;
+        posYSlider.max = img.height;
+        
+        // Logical default positions (approx 12% from left, 12.5% from top)
+        posXSlider.value = Math.round(img.width * 0.12);
+        posYSlider.value = Math.round(img.height * 0.125);
+        fontSizeSlider.value = Math.round(img.height * 0.035);
+
+        draw();
+    };
+
+    // If local file 'shok_patra.png' is missing, alert user they can upload it.
+    img.onerror = function() {
+        alert("Please select/upload your Shok Patra image using the upload area at the top.");
+    };
+
+    // Handle Manual Image Upload
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Redraw Canvas whenever any input changes
+    nameInput.addEventListener('input', draw);
+    posXSlider.addEventListener('input', draw);
+    posYSlider.addEventListener('input', draw);
+    fontSizeSlider.addEventListener('input', draw);
+
+    function draw() {
+        if (!img.complete) return;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw original background image
+        ctx.drawImage(img, 0, 0);
+
+        // Fetch values
+        const name = nameInput.value;
+        const x = parseInt(posXSlider.value);
+        const y = parseInt(posYSlider.value);
+        const size = parseInt(fontSizeSlider.value);
+
+        // Style and write the name
+        ctx.font = `bold ${size}px "Times New Roman", Georgia, serif`;
+        ctx.fillStyle = '#000000'; // Black color to match template
+        ctx.textBaseline = 'bottom'; // Ensures text aligns nicely on the horizontal line
+        ctx.fillText(name, x, y);
+    }
+
+    // Function 1: Save Image to Device Gallery
+    function downloadImage() {
+        const link = document.createElement('a');
+        link.download = `shok_patra_${nameInput.value.replace(/\s+/g, '_')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // Function 2: Send Image via WhatsApp
+    async function shareOnWhatsApp() {
+        draw(); // Ensure it is updated
+
+        canvas.toBlob(async (blob) => {
+            if (!blob) {
+                alert("Could not process image.");
+                return;
+            }
+
+            const file = new File([blob], "shok_patra_invitation.png", { type: "image/png" });
+
+            // Detect if Web Share API is available (primarily mobile devices & modern browsers)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Shok Patra Invitation',
+                        text: `Shok Patra Invitation for ${nameInput.value}`
+                    });
+                } catch (error) {
+                    if (error.name !== 'AbortError') {
+                        alert("Error sharing: " + error.message);
+                    }
+                }
+            } else {
+                // Desktop fallback behavior
+                downloadImage();
+                alert("Direct image sharing is restricted by desktop browsers. \n\nWe have automatically downloaded the image to your gallery. Please open WhatsApp, select your contact, and attach the downloaded image.");
+                window.open('https://web.whatsapp.com/', '_blank');
+            }
+        }, 'image/png');
+    }
+</script>
+
+</body>
+</html>
