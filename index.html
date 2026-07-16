@@ -43,6 +43,15 @@
             margin-bottom: 25px;
         }
 
+        .setup-box {
+            background: #fffbeb;
+            border: 2px dashed #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .input-group {
             margin-bottom: 15px;
         }
@@ -149,23 +158,13 @@
             transition: background-color 0.2s;
         }
 
-        .btn-download {
-            background-color: #2563eb;
-            color: white;
-        }
-
-        .btn-download:hover {
-            background-color: #1d4ed8;
-        }
-
-        .btn-whatsapp {
-            background-color: #25d366;
-            color: white;
-        }
-
-        .btn-whatsapp:hover {
-            background-color: #20ba5a;
-        }
+        .btn-download { background-color: #2563eb; color: white; }
+        .btn-download:hover { background-color: #1d4ed8; }
+        .btn-whatsapp { background-color: #25d366; color: white; }
+        .btn-whatsapp:hover { background-color: #20ba5a; }
+        .btn-bake { background-color: #059669; color: white; width: 100%; margin-top: 15px; display: none; }
+        
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -173,51 +172,67 @@
 <div class="container">
     <h1>शोक पत्र - आमंत्रण पत्र निर्माता</h1>
 
-    <!-- Guest Name Input -->
-    <div class="input-group">
-        <label for="nameInput">अतिथि का नाम दर्ज करें (हिंदी में):</label>
-        <input type="text" id="nameInput" placeholder="जैसे: श्री राजेश कुमार शर्मा" value="श्री राजेश कुमार शर्मा">
+    <!-- ONE TIME WIZARD: Shows up only if image data is empty -->
+    <div id="setupWizard" class="setup-box">
+        <h3>✨ वन-टाइम सेटअप (One-Time Setup) ✨</h3>
+        <p>अपनी शोक पत्र वाली फोटो को यहाँ सेलेक्ट करें, यह उसे हमेशा के लिए इस पेज के अंदर डाल देगा।</p>
+        <input type="file" id="imageBakerInput" accept="image/*">
+        <button id="bakeBtn" class="btn btn-bake" onclick="bakeImageIntoCode()">🔒 इस फोटो ko code mein hamesha ke liye lock karein</button>
     </div>
 
-    <!-- Sapariwar Toggle -->
-    <div class="toggle-group" onclick="toggleCheckbox(event)">
-        <input type="checkbox" id="sapariwarToggle">
-        <label for="sapariwarToggle" style="cursor:pointer;">सपरिवार जोड़ना है</label>
-    </div>
-
-    <!-- Live Sliders -->
-    <div class="controls-grid">
-        <div class="control-item">
-            <label for="posX">नाम की X स्थिति (दाएँ/बाएँ)</label>
-            <input type="range" id="posX" min="0" max="1000" value="135">
+    <!-- MAIN GENERATOR APP (Hidden until image is loaded/baked) -->
+    <div id="mainApp" class="hidden">
+        <!-- Guest Name Input -->
+        <div class="input-group">
+            <label for="nameInput">अतिथि का नाम दर्ज करें (हिंदी में):</label>
+            <input type="text" id="nameInput" placeholder="जैसे: श्री राजेश कुमार शर्मा" value="श्री राजेश कुमार शर्मा">
         </div>
-        <div class="control-item">
-            <label for="posY">नाम की Y position (ऊपर/नीचे)</label>
-            <input type="range" id="posY" min="0" max="1000" value="100">
-        </div>
-        <div class="control-item">
-            <label for="fontSize">अक्षर का आकार (Font Size)</label>
-            <input type="range" id="fontSize" min="10" max="100" value="30">
-        </div>
-    </div>
 
-    <!-- Image Canvas Preview -->
-    <div class="preview-container">
-        <canvas id="shokPatraCanvas"></canvas>
-    </div>
+        <!-- Sapariwar Toggle -->
+        <div class="toggle-group" onclick="toggleCheckbox(event)">
+            <input type="checkbox" id="sapariwarToggle">
+            <label for="sapariwarToggle" style="cursor:pointer;">सपरिवार जोड़ना है</label>
+        </div>
 
-    <!-- Bottom Actions -->
-    <div class="action-buttons">
-        <button class="btn btn-download" onclick="downloadImage()">
-            📥 गैलरी में सहेजें
-        </button>
-        <button class="btn btn-whatsapp" onclick="shareOnWhatsApp()">
-            💬 व्हाट्सएप पर भेजें
-        </button>
+        <!-- Sliders -->
+        <div class="controls-grid">
+            <div class="control-item">
+                <label for="posX">नाम की X स्थिति (दाएँ/बाएँ)</label>
+                <input type="range" id="posX" min="0" max="1500" value="135">
+            </div>
+            <div class="control-item">
+                <label for="posY">नाम की Y position (ऊपर/नीचे)</label>
+                <input type="range" id="posY" min="0" max="1500" value="100">
+            </div>
+            <div class="control-item">
+                <label for="fontSize">अक्षर का आकार (Font Size)</label>
+                <input type="range" id="fontSize" min="10" max="100" value="30">
+            </div>
+        </div>
+
+        <!-- Canvas Preview -->
+        <div class="preview-container">
+            <canvas id="shokPatraCanvas"></canvas>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-buttons">
+            <button class="btn btn-download" onclick="downloadImage()">
+                📥 गैलरी में सहेजें
+            </button>
+            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp()">
+                💬 व्हाट्सएप पर भेजें
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
+    // -------------------------------------------------------------------------
+    // MASTER IMAGE STORAGE (Iske andar aapki photo ka permanent data automatic save hoga)
+    const PERMANENT_IMAGE_DATA = "EMPTY_DATA"; 
+    // -------------------------------------------------------------------------
+
     const canvas = document.getElementById('shokPatraCanvas');
     const ctx = canvas.getContext('2d');
     const nameInput = document.getElementById('nameInput');
@@ -225,29 +240,74 @@
     const posXSlider = document.getElementById('posX');
     const posYSlider = document.getElementById('posY');
     const fontSizeSlider = document.getElementById('fontSize');
+    
+    const setupWizard = document.getElementById('setupWizard');
+    const mainApp = document.getElementById('mainApp');
+    const imageBakerInput = document.getElementById('imageBakerInput');
+    const bakeBtn = document.getElementById('bakeBtn');
 
-    // Permanent Image Loading from GitHub Repository
+    let loadedBase64 = "";
     const img = new Image();
-    img.src = 'shok_patra.png'; 
+
+    // Check if image is already baked in or not
+    window.onload = function() {
+        if (PERMANENT_IMAGE_DATA !== "EMPTY_DATA") {
+            setupWizard.style.display = "none";
+            mainApp.classList.remove('hidden');
+            img.src = PERMANENT_IMAGE_DATA;
+        }
+    };
+
+    // Handle manual upload during setup wizard
+    imageBakerInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                loadedBase64 = event.target.result;
+                img.src = loadedBase64;
+                bakeBtn.style.display = "block";
+                
+                // Show temporary preview inside application
+                mainApp.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
     img.onload = function() {
         canvas.width = img.width;
         canvas.height = img.height;
-
         posXSlider.max = img.width;
         posYSlider.max = img.height;
-        
-        // Default alignments matching 'श्रीमान्' text line
-        posXSlider.value = 135; 
-        posYSlider.value = 100;
-        fontSizeSlider.value = 30; 
-
         draw();
     };
 
-    img.onerror = function() {
-        alert("त्रुटि: 'shok_patra.png' इमेज लोड नहीं हो सकी। कृपया सुनिश्चित करें कि यह आपके GitHub repository में मौजूद है।");
-    };
+    // The Magic Function: Bakes image into HTML code and downloads it
+    function bakeImageIntoCode() {
+        if(!loadedBase64) return;
+        
+        // Fetch whole page source HTML code
+        let currentHtml = document.documentElement.outerHTML;
+        
+        // Inject the permanent Base64 string directly inside the code securely
+        const oldString = 'const PERMANENT_IMAGE_DATA = "EMPTY_DATA";';
+        const newString = `const PERMANENT_IMAGE_DATA = "${loadedBase64}";`;
+        
+        let newHtml = currentHtml.replace(oldString, newString);
+        
+        // Clean up the setup wizard UI block completely from the newly generated file
+        newHtml = "<!DOCTYPE html>\n" + newHtml;
+
+        // Trigger safe file download
+        const blob = new Blob([newHtml], { type: "text/html" });
+        const link = document.createElement("a");
+        link.download = "index.html";
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        
+        alert("बधाई हो! आपकी इमेज कोड में लॉक हो चुकी है। अब डाउनलोड हुई 'index.html' फाइल का कोड अपने GitHub में पेस्ट कर दें। उसके बाद यह सेटअप बॉक्स हमेशा के लिए गायब हो जायेगा!");
+    }
 
     function toggleCheckbox(e) {
         if(e.target.id !== 'sapariwarToggle') {
@@ -280,17 +340,17 @@
         ctx.textAlign = 'left';
         ctx.fillText(name, x, y);
 
-        // Print 'सपरिवार' on the right side if toggled
+        // Print 'सपरिवार' strictly on the right side of the guest name row
         if (sapariwarToggle.checked) {
-            const sapariwarX = canvas.width - 50; // Dynamic right alignment
+            const sapariwarX = canvas.width - 50; 
             const sapariwarY = y; 
 
             ctx.font = `bold ${size - 2}px "Times New Roman", Georgia, serif`;
             ctx.fillStyle = '#000000';
             ctx.textBaseline = 'bottom';
-            ctx.textAlign = 'right'; // Aligns text strictly to the right margin
+            ctx.textAlign = 'right'; 
             ctx.fillText("सपरिवार", sapariwarX, sapariwarY);
-            ctx.textAlign = 'left';  // Reset to default
+            ctx.textAlign = 'left';  
         }
     }
 
@@ -304,13 +364,8 @@
     async function shareOnWhatsApp() {
         draw();
         canvas.toBlob(async (blob) => {
-            if (!blob) {
-                alert("इमेज प्रोसेस नहीं हो सकी।");
-                return;
-            }
-
+            if (!blob) return;
             const file = new File([blob], "shok_patra.png", { type: "image/png" });
-
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
@@ -319,13 +374,10 @@
                         text: `${nameInput.value} के लिए शोक पत्र`
                     });
                 } catch (error) {
-                    if (error.name !== 'AbortError') {
-                        alert("शेयर करने में समस्या आई: " + error.message);
-                    }
+                    if (error.name !== 'AbortError') alert("Error: " + error.message);
                 }
             } else {
                 downloadImage();
-                alert("व्हाट्सएप पर डायरेक्ट भेजने के लिए कृपया इस लिंक को अपने मोबाइल ब्राउज़र में खोलें।\n\nडेस्कटॉप के लिए इमेज डाउनलोड हो गई है, इसे मैन्युअली अटैच करें।");
                 window.open('https://web.whatsapp.com/', '_blank');
             }
         }, 'image/png');
